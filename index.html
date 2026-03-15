@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Knot Today — Docs</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap');
+
+:root {
+–bg: #1a1a2e;
+–surface: #16213e;
+–accent: #e94560;
+–text: #e8e8e8;
+–text-dim: #8899aa;
+–border: #2a3a5e;
+–link: #5dade2;
+–link-hover: #e94560;
+}
+
+- { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+background: var(–bg);
+color: var(–text);
+font-family: ‘IBM Plex Sans’, sans-serif;
+padding: 32px 24px;
+max-width: 700px;
+margin: 0 auto;
+min-height: 100vh;
+}
+
+h1 {
+font-family: ‘JetBrains Mono’, monospace;
+font-size: 1.4em;
+font-weight: 700;
+color: var(–accent);
+text-transform: uppercase;
+letter-spacing: 0.05em;
+margin-bottom: 4px;
+}
+
+.subtitle {
+font-size: 0.82em;
+color: var(–text-dim);
+font-family: ‘JetBrains Mono’, monospace;
+margin-bottom: 32px;
+}
+
+#doc-list {
+list-style: none;
+}
+
+#doc-list li {
+border: 1px solid var(–border);
+background: var(–surface);
+border-radius: 8px;
+margin-bottom: 10px;
+transition: border-color 0.2s;
+}
+
+#doc-list li:hover {
+border-color: var(–accent);
+}
+
+#doc-list a {
+display: block;
+padding: 16px 18px;
+color: var(–link);
+text-decoration: none;
+font-family: ‘JetBrains Mono’, monospace;
+font-size: 0.88em;
+font-weight: 500;
+transition: color 0.2s;
+}
+
+#doc-list a:hover {
+color: var(–link-hover);
+}
+
+.file-meta {
+display: block;
+font-family: ‘IBM Plex Sans’, sans-serif;
+font-size: 0.82em;
+color: var(–text-dim);
+font-weight: 400;
+margin-top: 4px;
+}
+
+#loading {
+color: var(–text-dim);
+font-family: ‘JetBrains Mono’, monospace;
+font-size: 0.85em;
+padding: 20px 0;
+}
+
+.empty-state {
+color: var(–text-dim);
+font-size: 0.9em;
+padding: 40px 0;
+text-align: center;
+}
+
+footer {
+margin-top: 48px;
+padding-top: 16px;
+border-top: 1px solid var(–border);
+font-size: 0.7em;
+color: var(–text-dim);
+font-family: ‘JetBrains Mono’, monospace;
+}
+</style>
+
+</head>
+<body>
+
+<h1>Knot Today</h1>
+<div class="subtitle">1980 Hatteras 50C — documentation &amp; reference</div>
+
+<ul id="doc-list">
+  <li id="loading">Loading docs...</li>
+</ul>
+
+<footer>Knot Today — Punta Gorda / Bokeelia, FL</footer>
+
+<script>
+(async () => {
+  const list = document.getElementById('doc-list');
+
+  // Extract GitHub Pages info from current URL
+  // Expected: https://<user>.github.io/<repo>/
+  const parts = window.location.pathname.split('/').filter(Boolean);
+  const repo = parts[0] || '';
+  const pathPrefix = parts.slice(1).join('/');
+
+  // Try to get the repo owner from the hostname
+  const hostParts = window.location.hostname.split('.');
+  const owner = hostParts[0]; // e.g. "bec-archer" from "bec-archer.github.io"
+
+  if (!owner || !repo) {
+    // Fallback: just show static links for any .html files we know about
+    showFallback();
+    return;
+  }
+
+  try {
+    // Use GitHub API to list repo contents
+    const apiUrl = pathPrefix
+      ? `https://api.github.com/repos/${owner}/${repo}/contents/${pathPrefix}`
+      : `https://api.github.com/repos/${owner}/${repo}/contents`;
+
+    const resp = await fetch(apiUrl);
+
+    if (!resp.ok) {
+      showFallback();
+      return;
+    }
+
+    const files = await resp.json();
+
+    // Filter to renderable files (html, pdf, md) excluding index.html
+    const docs = files
+      .filter(f => f.type === 'file' && f.name !== 'index.html')
+      .filter(f => /\.(html|pdf|md)$/i.test(f.name))
+      .sort((a, b) => a.name.localeCompare(b.name));
+
+    list.innerHTML = '';
+
+    if (docs.length === 0) {
+      list.innerHTML = '<li class="empty-state">No docs yet. Upload some HTML, PDF, or MD files to this repo.</li>';
+      return;
+    }
+
+    docs.forEach(file => {
+      const li = document.createElement('li');
+      const a = document.createElement('a');
+      a.href = file.name;
+
+      // Make the filename human-readable
+      const prettyName = file.name
+        .replace(/\.(html|pdf|md)$/i, '')
+        .replace(/[-_]/g, ' ')
+        .replace(/\b\w/g, c => c.toUpperCase());
+
+      const ext = file.name.split('.').pop().toUpperCase();
+      const sizeKB = file.size ? `${(file.size / 1024).toFixed(1)} KB` : '';
+
+      a.innerHTML = `${prettyName}<span class="file-meta">${ext} ${sizeKB ? '· ' + sizeKB : ''} · ${file.name}</span>`;
+      li.appendChild(a);
+      list.appendChild(li);
+    });
+
+  } catch (e) {
+    showFallback();
+  }
+
+  function showFallback() {
+    // If API fails (rate limit, private repo, local dev, etc.)
+    // Scan the page for any known files or just show a message
+    list.innerHTML = `
+      <li><a href="knot-today-ac-wiring-verified.html">
+        Webasto + Cruisair Frankenstein AC Wiring (Verified)
+        <span class="file-meta">HTML · knot-today-ac-wiring-verified.html</span>
+      </a></li>
+    `;
+  }
+})();
+</script>
+
+</body>
+</html>
