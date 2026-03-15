@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Knot Today — Compressor Run Capacitor Wiring</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap');
+
+:root {
+–bg: #1a1a2e;
+–surface: #16213e;
+–accent: #e94560;
+–text: #e8e8e8;
+–text-dim: #8899aa;
+–text-label: #ccd6e0;
+–border: #2a3a5e;
+–ok: #44cc88;
+–warn: #ffaa33;
+–danger: #ff4466;
+–wire-hot: #ff4444;
+–wire-neutral: #eeeeee;
+–wire-run: #ff8844;
+–wire-start: #ff44aa;
+–wire-common: #4488ff;
+}
+
+- { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+background: var(–bg);
+color: var(–text);
+font-family: ‘IBM Plex Sans’, sans-serif;
+padding: 24px;
+max-width: 800px;
+margin: 0 auto;
+line-height: 1.6;
+}
+
+h1 {
+font-family: ‘JetBrains Mono’, monospace;
+font-size: 1.2em;
+font-weight: 700;
+color: var(–accent);
+text-transform: uppercase;
+letter-spacing: 0.05em;
+border-bottom: 2px solid var(–accent);
+padding-bottom: 8px;
+margin-bottom: 6px;
+}
+
+.subtitle {
+font-size: 0.78em;
+color: var(–text-dim);
+margin-bottom: 20px;
+font-family: ‘JetBrains Mono’, monospace;
+}
+
+.section {
+background: var(–surface);
+border: 1px solid var(–border);
+border-radius: 8px;
+padding: 18px;
+margin-bottom: 16px;
+}
+
+.section h2 {
+font-family: ‘JetBrains Mono’, monospace;
+font-size: 0.9em;
+font-weight: 600;
+color: var(–text-label);
+margin-bottom: 12px;
+text-transform: uppercase;
+letter-spacing: 0.04em;
+}
+
+.flow-diagram {
+background: var(–bg);
+border: 1px solid var(–border);
+border-radius: 6px;
+padding: 16px;
+margin-top: 12px;
+font-family: ‘JetBrains Mono’, monospace;
+font-size: 0.72em;
+line-height: 1.7;
+overflow-x: auto;
+white-space: pre;
+color: var(–text-dim);
+}
+
+.flow-diagram .box { color: var(–text); font-weight: 600; }
+.flow-diagram .hot { color: var(–wire-hot); }
+.flow-diagram .neut { color: var(–wire-neutral); }
+.flow-diagram .run { color: var(–wire-run); }
+.flow-diagram .start { color: var(–wire-start); }
+.flow-diagram .common { color: var(–wire-common); }
+.flow-diagram .note { color: var(–warn); font-style: italic; }
+.flow-diagram .label { color: var(–text-label); font-weight: 600; }
+
+.warn-box {
+background: rgba(255, 170, 51, 0.08);
+border: 1px solid var(–warn);
+border-left: 4px solid var(–warn);
+border-radius: 6px;
+padding: 16px;
+margin-bottom: 16px;
+font-size: 0.85em;
+}
+.warn-box strong { color: var(–warn); }
+
+.danger-box {
+background: rgba(255, 68, 102, 0.08);
+border: 1px solid var(–danger);
+border-left: 4px solid var(–danger);
+border-radius: 6px;
+padding: 16px;
+margin-bottom: 16px;
+font-size: 0.85em;
+}
+.danger-box strong { color: var(–danger); }
+
+.notes {
+font-size: 0.82em;
+color: var(–text-dim);
+margin-top: 8px;
+line-height: 1.7;
+}
+.notes em { color: var(–text-label); font-style: normal; font-weight: 500; }
+
+.wire-table {
+width: 100%;
+border-collapse: collapse;
+font-size: 0.85em;
+margin-top: 8px;
+}
+.wire-table th {
+font-family: ‘JetBrains Mono’, monospace;
+font-size: 0.78em;
+text-transform: uppercase;
+letter-spacing: 0.05em;
+color: var(–text-dim);
+text-align: left;
+padding: 6px 10px;
+border-bottom: 1px solid var(–border);
+}
+.wire-table td {
+padding: 8px 10px;
+border-bottom: 1px solid rgba(42, 58, 94, 0.5);
+vertical-align: middle;
+}
+.wire-table tr:last-child td { border-bottom: none; }
+
+.wire-dot {
+display: inline-block;
+width: 12px;
+height: 12px;
+border-radius: 50%;
+margin-right: 6px;
+vertical-align: middle;
+border: 1px solid rgba(255,255,255,0.2);
+}
+
+.source-line {
+font-size: 0.68em;
+color: var(–text-dim);
+margin-top: 20px;
+font-family: ‘JetBrains Mono’, monospace;
+line-height: 1.5;
+}
+</style>
+
+</head>
+<body>
+
+<h1>Compressor Run Capacitor Wiring</h1>
+<div class="subtitle">Webasto FCF16000 compressor controlled by Cruisair SMX II P/L board<br>
+Standard single-phase hermetic compressor with C / S / R terminals</div>
+
+<!-- WHAT IS THE RUN CAPACITOR -->
+
+<div class="section">
+  <h2>What The Run Capacitor Does</h2>
+  <div class="notes">
+    The run capacitor creates the phase shift needed to keep the compressor motor's start winding energized during operation. It sits between the <em>R (Run)</em> and <em>S (Start)</em> terminals of the compressor. Without it, the compressor either won't start or will hum, draw locked rotor amps, trip the overload, and shut down.
+  </div>
+</div>
+
+<!-- TERMINAL REFERENCE -->
+
+<div class="section">
+  <h2>Compressor Terminal Reference</h2>
+  <div class="notes">
+    Look at the top of the compressor — there's a terminal cover (usually held on by a clip or screw). Under it you'll find three spade terminals stamped or labeled:
+  </div>
+  <table class="wire-table">
+    <tr>
+      <th>Terminal</th>
+      <th>Name</th>
+      <th>What It Does</th>
+    </tr>
+    <tr>
+      <td><span class="wire-dot" style="background:var(--wire-common)"></span><strong>C</strong></td>
+      <td>Common</td>
+      <td>Main power feed from P/L board (via TRIAC switch). This is the "always hot when running" terminal.</td>
+    </tr>
+    <tr>
+      <td><span class="wire-dot" style="background:var(--wire-start)"></span><strong>S</strong></td>
+      <td>Start</td>
+      <td>Start winding. Run cap connects here.</td>
+    </tr>
+    <tr>
+      <td><span class="wire-dot" style="background:var(--wire-run)"></span><strong>R</strong></td>
+      <td>Run</td>
+      <td>Run winding. Power feed AND run cap connect here.</td>
+    </tr>
+  </table>
+  <div class="notes" style="margin-top:12px;">
+    <em>How to identify if not labeled:</em> Using a multimeter on the disconnected compressor, measure resistance between all three pairs. The pair with the <strong>highest</strong> resistance is S-to-R (start + run windings in series). The remaining terminal is C. The lower resistance from C is to R (run winding); the higher resistance from C is to S (start winding).
+  </div>
+</div>
+
+<!-- THE DIAGRAM -->
+
+<div class="section">
+  <h2>Wiring Diagram</h2>
+  <div class="flow-diagram">
+<span class="label">FROM CRUISAIR P/L BOARD:</span>
+
+<span class="hot">  COMP (switched L1) ─────────────────────────────────┐</span>
+<span class="neut">  N2 (neutral) ────────────────────────────────────────┤</span>
+│
+│
+<span class="box">          ┌─────────────────────────────────────────────┐</span>
+<span class="box">          │           COMPRESSOR (top view)              │</span>
+<span class="box">          │                                              │</span>
+<span class="box">          │       ┌─────┐  ┌─────┐  ┌─────┐            │</span>
+<span class="box">          │       │  C  │  │  S  │  │  R  │            │</span>
+<span class="box">          │       └──┬──┘  └──┬──┘  └──┬──┘            │</span>
+<span class="box">          │          │        │        │               │</span>
+<span class="box">          └──────────┼────────┼────────┼───────────────┘</span>
+│        │        │
+<span class="common">                     │</span>        │        │
+<span class="common">    COMP (hot) ──────┘</span>        │        <span class="hot">│←── N2 (neutral)</span>
+│        │
+│        │
+<span class="box">                    ┌─────────┴────────┴──────────┐</span>
+<span class="box">                    │                              │</span>
+<span class="box">                    │      RUN CAPACITOR           │</span>
+<span class="box">                    │      25 MFD / 370 VAC        │</span>
+<span class="box">                    │                              │</span>
+<span class="box">                    │   Terminal 1    Terminal 2   │</span>
+<span class="box">                    │   (to S)        (to R)       │</span>
+<span class="box">                    │                              │</span>
+<span class="box">                    └──────────────────────────────┘</span>
+
+<span class="label">SIMPLIFIED CIRCUIT:</span>
+
+<span class="hot">  COMP (hot from P/L board)</span>
+│
+▼
+<span class="common">  ┌──C──┐</span>                      <span class="note">Run cap bridges S and R</span>
+<span class="common">  │     │</span>                      <span class="note">Cap is NOT polarized:</span>
+<span class="start">  S     </span><span class="run">R</span> ◄── <span class="neut">N2 (neutral)</span>     <span class="note">either terminal to either post</span>
+<span class="start">  │     </span><span class="run">│</span>
+<span class="start">  └──</span><span class="box">CAP</span><span class="run">──┘</span>
+<span class="box"> 25 MFD</span></div>
+
+</div>
+
+<!-- WIRING SUMMARY -->
+
+<div class="section">
+  <h2>Wiring Summary — 4 Connections Total</h2>
+  <table class="wire-table">
+    <tr>
+      <th>#</th>
+      <th>From</th>
+      <th>To</th>
+      <th>Notes</th>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>P/L board <strong>COMP</strong> output</td>
+      <td>Compressor <strong>C</strong> (Common)</td>
+      <td>Switched hot — this is the line the TRIAC controls</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>P/L board <strong>N2</strong> (neutral)</td>
+      <td>Compressor <strong>R</strong> (Run)</td>
+      <td>Neutral return to run winding</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>Run cap terminal 1</td>
+      <td>Compressor <strong>S</strong> (Start)</td>
+      <td>Cap not polarized, either terminal works</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>Run cap terminal 2</td>
+      <td>Compressor <strong>R</strong> (Run)</td>
+      <td>Shares the R terminal with the neutral wire</td>
+    </tr>
+  </table>
+</div>
+
+<!-- IMPORTANT NOTES -->
+
+<div class="danger-box">
+  <strong>🚨 KILL THE BREAKER FIRST.</strong> Then discharge the old capacitor by shorting its terminals together with an insulated screwdriver before touching anything. Caps hold charge even with power off.
+</div>
+
+<div class="warn-box">
+  <strong>⚠ IMPORTANT NOTES:</strong><br><br>
+  <strong>The run cap is NOT polarized</strong> — it doesn't matter which cap terminal goes to S vs R. Either way works.<br><br>
+  <strong>The cap sits across S and R only.</strong> It does NOT connect to C. If you find a wire from the cap going to C, something's wrong.<br><br>
+  <strong>On the Cruisair SXF5-16 schematic (Dwg C0010001)</strong>, the P/L board's TRIAC switches the COMP output to the compressor's C terminal. The run capacitor and compressor motor are a self-contained subcircuit between C, S, and R — the P/L board doesn't directly interact with the cap.<br><br>
+  <strong>If you also have a start capacitor and/or start relay:</strong> that's a separate hard-start circuit. The start cap is typically smaller and darker (often black), wired in parallel with the run cap but switched by a potential relay or PTC device. Not all units have one. If yours doesn't currently have one and the compressor is struggling to start, a Micro-Air EasyStart is the modern fix.
+</div>
+
+<!-- TESTING THE OLD CAP -->
+
+<div class="section">
+  <h2>Testing The Old Capacitor</h2>
+  <div class="notes">
+    <em>Before swapping:</em> set your multimeter to capacitance mode (if it has one) and measure across the two cap terminals (disconnected from everything, discharged first).<br><br>
+    A healthy 25 MFD cap should read somewhere between <em>22.5 and 27.5 MFD</em> (within ~10%). If it reads significantly below 20 MFD, it's weak and the compressor is struggling. If it reads 0 or shows a short, it's dead.<br><br>
+    <em>No capacitance mode?</em> Use ohms: touch probes to cap terminals. Should briefly show near-zero then climb steadily toward infinity (open). If it stays at zero = shorted. If it starts at infinity and never moves = open/dead.<br><br>
+    Also visually inspect: <em>bulging top/bottom, leaking fluid, or scorch marks</em> = replace immediately.
+  </div>
+</div>
+
+<div class="source-line">
+  Sources: Cruisair SXF5-16 schematic Dwg C0010001 (L-2382) | Webasto FCF Series Install Manual |
+  Club Sea Ray / Trawler Forum Cruisair compressor wiring threads | Standard HVAC CSR compressor wiring practice<br><br>
+  Knot Today — 1980 Hatteras 50C — Webasto FCF16000GS + Cruisair SXF16/2-RMT
+</div>
+
+</body>
+</html>
