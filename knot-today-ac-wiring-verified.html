@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Knot Today — Webasto FCF16000 + Cruisair SMX II Wiring (Verified)</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap');
+
+:root {
+–bg: #1a1a2e;
+–surface: #16213e;
+–surface-alt: #0f3460;
+–accent: #e94560;
+–accent-dim: #b8364d;
+–wire-hot: #ff4444;
+–wire-neutral: #eeeeee;
+–wire-ground: #44cc44;
+–wire-pump: #4488ff;
+–wire-signal: #ffaa00;
+–wire-press: #cc66ff;
+–text: #e8e8e8;
+–text-dim: #8899aa;
+–text-label: #ccd6e0;
+–border: #2a3a5e;
+–ok: #44cc88;
+–warn: #ffaa33;
+–danger: #ff4466;
+}
+
+- { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+background: var(–bg);
+color: var(–text);
+font-family: ‘IBM Plex Sans’, sans-serif;
+padding: 24px;
+max-width: 900px;
+margin: 0 auto;
+line-height: 1.6;
+}
+
+h1 {
+font-family: ‘JetBrains Mono’, monospace;
+font-size: 1.3em;
+font-weight: 700;
+color: var(–accent);
+text-transform: uppercase;
+letter-spacing: 0.05em;
+border-bottom: 2px solid var(–accent);
+padding-bottom: 8px;
+margin-bottom: 6px;
+}
+
+.subtitle {
+font-size: 0.82em;
+color: var(–text-dim);
+margin-bottom: 20px;
+font-family: ‘JetBrains Mono’, monospace;
+}
+
+.verified {
+display: inline-block;
+background: var(–ok);
+color: #111;
+font-size: 0.7em;
+font-weight: 700;
+padding: 2px 8px;
+border-radius: 3px;
+margin-left: 8px;
+vertical-align: middle;
+letter-spacing: 0.05em;
+}
+
+.correction {
+display: inline-block;
+background: var(–warn);
+color: #111;
+font-size: 0.7em;
+font-weight: 700;
+padding: 2px 8px;
+border-radius: 3px;
+margin-left: 8px;
+vertical-align: middle;
+letter-spacing: 0.05em;
+}
+
+.section {
+background: var(–surface);
+border: 1px solid var(–border);
+border-radius: 8px;
+padding: 18px;
+margin-bottom: 16px;
+}
+
+.section h2 {
+font-family: ‘JetBrains Mono’, monospace;
+font-size: 0.95em;
+font-weight: 600;
+color: var(–text-label);
+margin-bottom: 12px;
+text-transform: uppercase;
+letter-spacing: 0.04em;
+}
+
+.wire-table {
+width: 100%;
+border-collapse: collapse;
+font-size: 0.85em;
+margin-top: 8px;
+}
+
+.wire-table th {
+font-family: ‘JetBrains Mono’, monospace;
+font-size: 0.78em;
+text-transform: uppercase;
+letter-spacing: 0.05em;
+color: var(–text-dim);
+text-align: left;
+padding: 6px 10px;
+border-bottom: 1px solid var(–border);
+}
+
+.wire-table td {
+padding: 8px 10px;
+border-bottom: 1px solid rgba(42, 58, 94, 0.5);
+vertical-align: middle;
+}
+
+.wire-table tr:last-child td { border-bottom: none; }
+
+.wire-dot {
+display: inline-block;
+width: 12px;
+height: 12px;
+border-radius: 50%;
+margin-right: 6px;
+vertical-align: middle;
+border: 1px solid rgba(255,255,255,0.2);
+}
+
+.wire-hot { background: var(–wire-hot); }
+.wire-neutral { background: var(–wire-neutral); }
+.wire-ground { background: var(–wire-ground); }
+.wire-pump { background: var(–wire-pump); }
+.wire-signal { background: var(–wire-signal); }
+.wire-press { background: var(–wire-press); }
+
+.flow-diagram {
+background: var(–bg);
+border: 1px solid var(–border);
+border-radius: 6px;
+padding: 16px;
+margin-top: 12px;
+font-family: ‘JetBrains Mono’, monospace;
+font-size: 0.78em;
+line-height: 1.8;
+overflow-x: auto;
+white-space: pre;
+color: var(–text-dim);
+}
+
+.flow-diagram .label {
+color: var(–text-label);
+font-weight: 600;
+}
+
+.flow-diagram .hot { color: var(–wire-hot); }
+.flow-diagram .neut { color: var(–wire-neutral); }
+.flow-diagram .gnd { color: var(–wire-ground); }
+.flow-diagram .pump { color: var(–wire-pump); }
+.flow-diagram .sig { color: var(–wire-signal); }
+.flow-diagram .press { color: var(–wire-press); }
+.flow-diagram .box {
+color: var(–text);
+font-weight: 600;
+}
+.flow-diagram .note {
+color: var(–warn);
+font-style: italic;
+}
+
+.warn-box {
+background: rgba(255, 170, 51, 0.08);
+border: 1px solid var(–warn);
+border-left: 4px solid var(–warn);
+border-radius: 6px;
+padding: 16px;
+margin-bottom: 16px;
+font-size: 0.85em;
+}
+
+.warn-box strong { color: var(–warn); }
+
+.danger-box {
+background: rgba(255, 68, 102, 0.08);
+border: 1px solid var(–danger);
+border-left: 4px solid var(–danger);
+border-radius: 6px;
+padding: 16px;
+margin-bottom: 16px;
+font-size: 0.85em;
+}
+
+.danger-box strong { color: var(–danger); }
+
+.ok-box {
+background: rgba(68, 204, 136, 0.08);
+border: 1px solid var(–ok);
+border-left: 4px solid var(–ok);
+border-radius: 6px;
+padding: 16px;
+margin-bottom: 16px;
+font-size: 0.85em;
+}
+
+.ok-box strong { color: var(–ok); }
+
+.checklist {
+list-style: none;
+font-size: 0.85em;
+margin-top: 10px;
+}
+
+.checklist li {
+padding: 5px 0;
+padding-left: 24px;
+position: relative;
+}
+
+.checklist li::before {
+content: ‘☐’;
+position: absolute;
+left: 0;
+color: var(–text-dim);
+}
+
+.source-line {
+font-size: 0.68em;
+color: var(–text-dim);
+margin-top: 20px;
+font-family: ‘JetBrains Mono’, monospace;
+line-height: 1.5;
+}
+
+.notes {
+font-size: 0.82em;
+color: var(–text-dim);
+margin-top: 8px;
+line-height: 1.7;
+}
+
+.notes em { color: var(–text-label); font-style: normal; font-weight: 500; }
+</style>
+
+</head>
+<body>
+
+<h1>Knot Today — Frankenstein AC Wiring <span class="verified">VERIFIED</span></h1>
+<div class="subtitle">Webasto FCF16000 (115V) compressor/condenser → Cruisair SMX II P/L board (DX) control<br>
+Source: Cruisair L-2382, Dwg C0010001 (SXF5-16, 115V) &amp; Webasto FCF Series Install Manual (Rev L, 8/2018)</div>
+
+<!-- VERIFICATION SUMMARY -->
+
+<div class="ok-box">
+  <strong>✅ VERIFICATION RESULT:</strong> Sonnet's original schematic is <strong>fundamentally correct</strong> on all critical wiring paths. The Cruisair SMX II P/L board terminal layout, pressure switch rerouting procedure, pump terminal wiring, and signal cable routing all match the official documentation. Two minor clarifications added below.
+</div>
+
+<!-- SECTION 1: 115V POWER -->
+
+<div class="section">
+  <h2>1. Shore Power → Cruisair P/L Board → Webasto Compressor Unit <span class="verified">CORRECT</span></h2>
+
+  <table class="wire-table">
+    <tr>
+      <th>Wire</th>
+      <th>From</th>
+      <th>To</th>
+      <th>Terminal</th>
+      <th>Notes</th>
+    </tr>
+    <tr>
+      <td><span class="wire-dot wire-hot"></span>Line (Black)</td>
+      <td>Shore panel breaker</td>
+      <td>Cruisair P/L board</td>
+      <td><strong>L1</strong></td>
+      <td>115V hot, 12 AWG min (ABYC)</td>
+    </tr>
+    <tr>
+      <td><span class="wire-dot wire-neutral"></span>Neutral (White)</td>
+      <td>Shore panel neutral bus</td>
+      <td>Cruisair P/L board</td>
+      <td><strong>N1</strong></td>
+      <td>12 AWG min</td>
+    </tr>
+    <tr>
+      <td><span class="wire-dot wire-ground"></span>Ground (Green)</td>
+      <td>Shore panel ground bus</td>
+      <td>Cruisair P/L board</td>
+      <td><strong>GRND</strong> stud</td>
+      <td>ABYC E-8: MUST be landed</td>
+    </tr>
+    <tr>
+      <td><span class="wire-dot wire-hot"></span>Comp. Line</td>
+      <td>Cruisair P/L board</td>
+      <td>Webasto FCF terminal strip</td>
+      <td>P/L: <strong>COMP</strong> → FCF: <strong>L</strong></td>
+      <td>Switched by P/L board TRIAC</td>
+    </tr>
+    <tr>
+      <td><span class="wire-dot wire-neutral"></span>Comp. Neutral</td>
+      <td>Cruisair P/L board</td>
+      <td>Webasto FCF terminal strip</td>
+      <td>P/L: <strong>N2</strong> → FCF: <strong>N</strong></td>
+      <td>Common neutral return</td>
+    </tr>
+  </table>
+
+  <div class="notes">
+    <em>How this works:</em> Shore power feeds into the Cruisair P/L board at L1/N1. The P/L board uses a TRIAC to switch the compressor on/off based on thermostat demand. The switched output goes from the COMP terminal on the P/L board to the Webasto's L (line) terminal. The neutral passes through from N2 to the Webasto's N terminal. The Webasto's own digital display/controller is <strong>bypassed entirely</strong> — the Cruisair SMX II is now the brain.
+  </div>
+</div>
+
+<!-- SECTION 2: SEAWATER PUMP -->
+
+<div class="section">
+  <h2>2. Seawater Pump (March LC-3CP-MD, 115V) <span class="verified">CORRECT</span></h2>
+
+  <table class="wire-table">
+    <tr>
+      <th>Wire</th>
+      <th>From</th>
+      <th>To</th>
+      <th>Terminal</th>
+      <th>Notes</th>
+    </tr>
+    <tr>
+      <td><span class="wire-dot wire-pump"></span>Pump Line (Black)</td>
+      <td>Cruisair P/L board</td>
+      <td>March pump hot lead</td>
+      <td><strong>PUMP (1)</strong></td>
+      <td>P/L board switches pump on before compressor</td>
+    </tr>
+    <tr>
+      <td><span class="wire-dot wire-neutral"></span>Pump Neutral (White)</td>
+      <td>Cruisair P/L board</td>
+      <td>March pump neutral lead</td>
+      <td><strong>PUMP (2)</strong></td>
+      <td>Neutral return</td>
+    </tr>
+  </table>
+
+  <div class="notes">
+    <em>Confirmed from both manuals:</em> The Webasto FCF manual labels pump terminals as "Cooling Pump Line In" (terminal 1) and "Cooling Pump Neutral" (terminal 2). The Cruisair P/L board has matching PUMP terminals. In the Frankenstein config, the pump wires go to the <strong>Cruisair P/L board</strong> pump terminals (NOT the Webasto terminal strip), because the Cruisair board controls pump sequencing (pump starts a few seconds before compressor kicks on).
+    <br><br>
+    <em>If only one AC unit uses this pump:</em> no separate breaker needed — pump wires go straight to the P/L board terminals. If multiple AC units share one pump, a pump relay (Cruisair PR3X or PR8X) is required per the L-2382 manual.
+  </div>
+</div>
+
+<!-- SECTION 3: PRESSURE SWITCHES — THE CRITICAL FRANKENSTEIN BIT -->
+
+<div class="section">
+  <h2>3. Pressure Switch Rerouting <span class="verified">CORRECT</span> — THE KEY FRANKENSTEIN STEP</h2>
+
+  <table class="wire-table">
+    <tr>
+      <th>Switch</th>
+      <th>Action</th>
+      <th>P/L Board Terminal</th>
+      <th>Notes</th>
+    </tr>
+    <tr>
+      <td><span class="wire-dot wire-press"></span>High Pressure Switch</td>
+      <td>Disconnect from Webasto board; wire to Cruisair P/L</td>
+      <td><strong>HIGH PRESS</strong> (push-on terminals)</td>
+      <td>NC switch, opens on high head pressure</td>
+    </tr>
+    <tr>
+      <td><span class="wire-dot wire-press"></span>Low Pressure Switch</td>
+      <td>Disconnect from Webasto board; wire to Cruisair P/L</td>
+      <td><strong>LOW PRESS</strong> (push-on terminals)</td>
+      <td>Optional per Cruisair; recommended</td>
+    </tr>
+    <tr>
+      <td>—</td>
+      <td>Old Webasto switch wires: butt-splice together</td>
+      <td>—</td>
+      <td>Bypasses switches on Webasto side</td>
+    </tr>
+  </table>
+
+  <div class="warn-box">
+    <strong>⚠ THIS IS THE #1 GOTCHA ON FRANKENSTEIN INSTALLS.</strong><br><br>
+    The Cruisair L-2382 manual explicitly states: "A high-pressure switch must be connected to the SMX P/L board. It should be disconnected from its in-line application, and connected to the SMX P/L board at the push-on terminals labeled 'HIGH PRESS'. The wires that were connected to the high-pressure switch should then be butt connected together, effectively bypassing the switch."<br><br>
+    If you skip this step, the Cruisair board has <strong>no fault protection</strong> and won't know if the system is over-pressuring. Meanwhile, the Webasto's own board (which you've effectively disconnected by using the Cruisair as the controller) may still try to act on the switches and fight the Cruisair logic.
+  </div>
+
+  <div class="notes">
+    <em>Clarification vs. original schematic:</em> The low pressure switch is described as "recommended but optional" in the Cruisair manual if the original unit didn't have one. The Webasto FCF16000 <strong>does</strong> have both HP and LP protection built into its own controller (error codes E1 for high press, E3 for low press per the FCF manual), so the physical switches on the refrigerant lines should be present. Reroute both to the Cruisair P/L board.
+  </div>
+</div>
+
+<!-- SECTION 4: SIGNAL CABLES -->
+
+<div class="section">
+  <h2>4. SMX II Signal Cables (Low Voltage DC) <span class="verified">CORRECT</span></h2>
+
+  <table class="wire-table">
+    <tr>
+      <th>Cable</th>
+      <th>From</th>
+      <th>To</th>
+      <th>Notes</th>
+    </tr>
+    <tr>
+      <td><span class="wire-dot wire-signal"></span>CX cable (shielded, 3-conductor, 4-pin)</td>
+      <td>P/L board CX jack</td>
+      <td>SMX II AB keypad (cabin wall)</td>
+      <td>Use CXP## cable if using SMXir keypad</td>
+    </tr>
+    <tr>
+      <td><span class="wire-dot wire-signal"></span>TSEP cable (4-conductor, RJ-11)</td>
+      <td>P/L board "INSIDE TSE" jack</td>
+      <td>Temp sensor behind return air grille</td>
+      <td>Sensor must NOT touch evaporator coil</td>
+    </tr>
+  </table>
+
+  <div class="danger-box">
+    <strong>🚨 CRITICAL: Route CX/CXP and TSEP cables AWAY from all 115V power cables.</strong><br>
+    Per L-2382: "Do not route these cables beside A/C power cables, high voltage wiring, or antenna wires." Interference causes erratic SMX display behavior and temperature read errors. Standard phone cable will NOT work — must be Cruisair CX/CXP cables.
+  </div>
+</div>
+
+<!-- SECTION 5: BLOWER/FAN -->
+
+<div class="section">
+  <h2>5. Evaporator Blower (Fan) <span class="correction">CLARIFICATION</span></h2>
+
+  <div class="notes">
+    <em>This is where it gets unit-specific.</em> The Webasto FCF16000 has a built-in 3-speed blower that was designed to be controlled by the Webasto's own digital controller. The Cruisair SMX II P/L board has blower speed control outputs on standard Cruisair SX/FX units (the TRIAC-controlled blower circuits visible on the SXF5-16 schematic, Dwg C0010001).<br><br>
+    <strong>For the Frankenstein config:</strong> If the Webasto blower is wired through the Webasto control board, you have two options:<br><br>
+    <em>Option A (simpler):</em> Run the blower directly on a fixed speed (wire blower power straight to L1/N, bypassing both controllers). Fan runs continuously whenever the breaker is on. This is the most common approach on Frankenstein installs.<br><br>
+    <em>Option B (full integration):</em> Wire the Webasto blower motor leads into the Cruisair P/L board's fan output terminals. This gives you SMX-controlled variable speed. However, this requires matching the Webasto blower motor's wiring (capacitor values, speed taps) to what the Cruisair board expects — this is unit-specific and you should check the diagram on the inside of your P/L box door.<br><br>
+    <strong>Sonnet's original schematic didn't explicitly address blower wiring</strong>, which is fine — this is the one area that depends on what's physically in front of you. Check which option your existing install uses.
+  </div>
+</div>
+
+<!-- VISUAL FLOW DIAGRAM -->
+
+<div class="section">
+  <h2>6. Signal Flow Diagram</h2>
+  <div class="flow-diagram"><span class="box">SHORE POWER</span>
+    │
+    ├──<span class="hot"> L1 (BLK) ─────────────────────────────────┐</span>
+    ├──<span class="neut"> N1 (WHT) ─────────────────────────────────┤</span>
+    └──<span class="gnd"> GRND (GRN) ───────────────────────────────┤</span>
+                                                   │
+                                          <span class="box">┌────────────────┐</span>
+                                          <span class="box">│  CRUISAIR P/L  │</span>
+                                          <span class="box">│  BOARD (SMX II)│</span>
+                                          <span class="box">│                │</span>
+                                          <span class="box">│  L1  N1  GRND  │</span> ← power in
+                                          <span class="box">│                │</span>
+                                          <span class="box">│  COMP    N2    │</span> ← switched compressor out
+                                          <span class="box">│                │</span>
+                                          <span class="box">│  PUMP(1) (2)   │</span> ← switched pump out
+                                          <span class="box">│                │</span>
+                                          <span class="box">│  HI-P   LO-P  │</span> ← pressure switch inputs
+                                          <span class="box">│                │</span>
+                                          <span class="box">│  CX    TSEP    │</span> ← signal jacks
+                                          <span class="box">│  3.15A fuse    │</span>
+                                          <span class="box">└───┬──┬──┬──┬──┘</span>
+                                              │  │  │  │
+    <span class="hot">COMP ─────────────────────────────────────────┘</span>  │  │  │
+    <span class="neut">N2 ───────────────────────────────────────────────┘</span>  │  │
+                           │                            │  │
+                  <span class="box">┌────────┴────────┐</span>                 │  │
+                  <span class="box">│  WEBASTO FCF    │</span>                 │  │
+                  <span class="box">│  16000 (115V)   │</span>                 │  │
+                  <span class="box">│                 │</span>                 │  │
+                  <span class="box">│  L    N    1  2 │</span>                 │  │
+                  <span class="box">│  ↑    ↑         │</span>                 │  │
+                  <span class="box">│  │    │   (pump  │</span>                 │  │
+                  <span class="box">│  │    │  terminals│</span>                │  │
+                  <span class="box">│  │    │  UNUSED) │</span>                 │  │
+                  <span class="box">└──┴────┴─────────┘</span>                 │  │
+                                                        │  │
+    <span class="pump">PUMP(1) ──── March LC-3CP-MD (hot) ─────────────────┘</span>  │
+    <span class="neut">PUMP(2) ──── March LC-3CP-MD (neutral) ────────────────┘</span>
+                           │
+                  <span class="box">┌────────┴────────┐</span>
+                  <span class="box">│  MARCH PUMP     │</span>
+                  <span class="box">│  LC-3CP-MD      │</span>
+                  <span class="box">│  (115V, mag     │</span>
+                  <span class="box">│   drive)        │</span>
+                  <span class="box">└─────────────────┘</span>
+
+```
+<span class="press">HIGH PRESS sw ──── from Webasto refrig. loop ──── Cruisair HI-P terminals</span>
+<span class="press">LOW PRESS sw  ──── from Webasto refrig. loop ──── Cruisair LO-P terminals</span>
+<span class="note">Old Webasto switch wires: butt-spliced together (bypassed)</span>
+
+<span class="sig">CX cable  ──── P/L board CX jack ──── SMX II keypad (cabin wall)</span>
+<span class="sig">TSEP cable ──── P/L board INSIDE TSE ──── temp sensor (return air)</span></div>
+```
+
+</div>
+
+<!-- PRE-POWER CHECKLIST -->
+
+<div class="section">
+  <h2>7. Pre-Power Checklist</h2>
+  <ul class="checklist">
+    <li>Green ground wire landed at GRND stud on P/L board (missing = electrolysis risk to thru-hulls)</li>
+    <li>Webasto pressure switch wires disconnected from Webasto board and rerouted to Cruisair HIGH PRESS / LOW PRESS terminals</li>
+    <li>Old Webasto pressure switch wires butt-spliced together (bypassed on Webasto side)</li>
+    <li>Seawater pump wired to Cruisair P/L board PUMP terminals (NOT Webasto terminals 1/2)</li>
+    <li>Webasto FCF pump terminals (1, 2) left disconnected / unused</li>
+    <li>CX/TSEP signal cables NOT bundled with 115V power cables</li>
+    <li>Seawater strainer clear, pump primed, raw water flow verified before first compressor start</li>
+    <li>P/L board 3.15A fuse present and intact</li>
+    <li>Breaker sized per Webasto data plate (30A HACR for 16K unit with 60A LRA)</li>
+    <li>Wait 30+ seconds between power cycles (compressor damage risk)</li>
+  </ul>
+</div>
+
+<!-- TROUBLESHOOTING QUICK-REF -->
+
+<div class="section">
+  <h2>8. Quick Troubleshooting</h2>
+  <div class="notes">
+    <em>SMX display won't light up?</em><br>
+    → Check CX/CXP cable at both ends (both plugs fully seated, all 4 pins engaged)<br>
+    → Verify 115V at L1-N1 terminals inside P/L box (open cover, use meter)<br>
+    → Check 3.15A fuse on P/L board<br>
+    → Factory memory reset: press OFF/SET/FAN together, then SET<br><br>
+
+```
+<em>Compressor runs but no cooling?</em><br>
+→ #1 cause: inadequate seawater flow. Check strainer, verify discharge stream overboard<br>
+→ High-pressure fault will shut down compressor (check SMX display for fault code)<br>
+→ Low refrigerant charge<br><br>
+
+<em>Erratic temperature display?</em><br>
+→ CX/TSEP cable routed too close to 115V wiring (interference)<br>
+→ TSEP sensor touching evaporator coil (must be in return air path only)<br>
+→ Calibrate: press OFF, then SET, then SET+UP together — adjust to match actual temp<br><br>
+
+<em>Compressor trips breaker on startup?</em><br>
+→ 25A breaker is undersized for 60A LRA. Need 30A HACR minimum<br>
+→ Or add EasyStart soft starter to reduce inrush to ~25A
+```
+
+  </div>
+</div>
+
+<div class="source-line">
+  Sources verified: Cruisair SMX II Control Systems (DX) Installation Manual L-2382 (Rev 12-6-04), Dwg C0010001 (SXF5-16 115V) |
+  Webasto FCF Series Installation &amp; Operation Manual (Rev L, 8/2018) | Cruisair DX Remote &amp; Self-Contained A/C Installation Manual |
+  Citimarine Store SMX II technical reference | Trawler Forum SXF16 wiring thread<br><br>
+  Knot Today — 1980 Hatteras 50C — Punta Gorda/Bokeelia, FL
+</div>
+
+</body>
+</html>
